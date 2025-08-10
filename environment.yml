@@ -11,7 +11,8 @@ dependencies:
       - torchaudio==2.8.0
       - tensorboard==2.20.0
       - tensorboardx==2.6.4
-      - opencv-python==4.12.0
+      - opencv-python==4.12.0.88
+      - ipython
       - tqdm
       - matplotlib
       - wandb
