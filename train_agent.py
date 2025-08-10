@@ -23,7 +23,7 @@ def main():
         world_size=(11,11),
         start_position=(0,0),
         goal_position=(10,10),
-        obstacle_positions=obstacle_positions,#[(3,3), (2,3), (1,3)],
+        obstacle_positions=obstacle_positions,
         max_steps=150,
     )
     # env.render(fps=0.25)

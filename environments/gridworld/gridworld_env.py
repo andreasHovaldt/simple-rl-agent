@@ -34,8 +34,6 @@ class GridWorldActionSpace(modules.ActionSpace):
 
 class GridWorldEnv(modules.Env):
     
-    action_space = GridWorldActionSpace()
-    
     WORLD_CONSTANTS = {
         "obstacle": -1,
         "empty": 0,
@@ -56,6 +54,8 @@ class GridWorldEnv(modules.Env):
             obstacle_positions: list[tuple[int, int],],
             max_steps: int = 50,
         ) -> None:
+        
+        self.action_space = GridWorldActionSpace()
         
         self.world_size = world_size
         

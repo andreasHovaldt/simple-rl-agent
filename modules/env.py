@@ -1,43 +1,44 @@
 import numpy as np
 from collections import namedtuple
+from abc import ABC, abstractmethod
 
 
 Transition = namedtuple("Transition", ("state", "action", "next_state", "reward"))
 
 
-class ActionSpace():
+class ActionSpace(ABC):
     def __init__(self) -> None:
         pass
     
     @property
+    @abstractmethod
     def n(self) -> int:
         """Return number of actions"""
-        raise NotImplementedError
     
     @property
-    def actions(self):
+    @abstractmethod
+    def actions(self) -> dict | list:
         """Return the actions"""
-        raise NotImplementedError
     
-    def sample(self):
+    @abstractmethod
+    def sample(self) -> int:
         """Return a sample of the action space"""
-        raise NotImplementedError
     
+    @abstractmethod
     def __len__(self) -> int:
         """Return the number of actions"""
-        raise NotImplementedError
 
 
-class Env():
-    action_space = ActionSpace()
+class Env(ABC):
     
     def __init__(self) -> None:
-        pass
+        self.action_space: ActionSpace
         
+    @abstractmethod
     def reset(self) -> tuple[np.ndarray, dict]:
         """Resets the environment and returns: (observation, info)"""
-        raise NotImplementedError
     
+    @abstractmethod
     def step(self, action) -> tuple[np.ndarray, float, bool, bool, dict]:
         """
         Steps the environment with the provided action
@@ -45,16 +46,15 @@ class Env():
         Returns:
             (observation, reward, terminated, truncated, info)
         """
-        raise NotImplementedError
         
+    @abstractmethod
     def observation(self) -> np.ndarray:
         """Returns an observations of the current environment"""
-        raise NotImplementedError
     
+    @abstractmethod
     def render(self, *args, **kwargs):
         """Renders the environment"""
-        raise NotImplementedError
 
+    @abstractmethod
     def close(self):
         """Closes the environment"""
-        raise NotImplementedError
