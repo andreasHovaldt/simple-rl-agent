@@ -53,7 +53,7 @@ class GridWorldEnv():
         return self.observation(), {}
     
         
-    def step(self, action):
+    def step(self, action: int):
         
         # Check if game has ended 
         if self.terminated or self.truncated:
@@ -98,6 +98,7 @@ class GridWorldEnv():
         
         # Get positions
         p_y, p_x = self.player_position
+        s_y, s_x = self.start_position
         g_y, g_x = self.goal_position
 
         # Adjacent tiles
@@ -107,18 +108,20 @@ class GridWorldEnv():
         right = self.world[p_y, p_x + 1]
 
         # Manhattan distance to goal
-        # dist = abs(g_y - p_y) + abs(g_x - p_x)
+        start_dist = abs(g_y - s_y) + abs(g_x - s_x)
+        current_dist = abs(g_y - p_y) + abs(g_x - p_x)
+        dist = current_dist/start_dist
         
         # Direction to goal
         dy, dx = g_y - p_y, g_x - p_x
         angle = np.arctan2(dy, dx)
     
         # Define observation
-        obs = np.array([up, down, left, right, np.cos(angle), np.sin(angle)], dtype=np.float32)
+        obs = np.array([up, down, left, right, np.cos(angle), np.sin(angle), dist], dtype=np.float32)
         return obs
     
     
-    def render(self, scale=50):
+    def render(self, scale=50, fps=2.0):
         
         # Map from world constants to RGB colors
         C = self.WORLD_CONSTANTS
@@ -144,7 +147,7 @@ class GridWorldEnv():
 
         # Show image in window
         cv2.imshow("World", rgb_image)
-        cv2.waitKey(1)
+        cv2.waitKey(int(1000//fps))
         
           
     def render_simple(self):
@@ -165,6 +168,10 @@ class GridWorldEnv():
 
     def close(self):
         cv2.destroyAllWindows()
+
+        
+    def sample_action_space(self) -> int:
+        return np.random.randint(low=0, high=self.ACTIONS.__len__())
 
 
     def _world_builder(self, size, goal, obstacles, dtype=np.int8) -> np.ndarray:
@@ -217,7 +224,7 @@ def main() -> None:
             score += reward # Add received reward to total score
         
         print(f"Episode:{episode} | Score:{score:.4f}")
-    
+
     env.close()
 
 
