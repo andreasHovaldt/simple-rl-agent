@@ -1,12 +1,11 @@
 import random
-from collections import namedtuple, deque
+from collections import deque
+import modules
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
-Transition = namedtuple("Transition", ("state", "action", "next_state", "reward"))
 
 class ReplayMemory(object):
     def __init__(self, size) -> None:
@@ -14,7 +13,7 @@ class ReplayMemory(object):
     
     def push(self, *args):
         """Save a transition"""
-        self.memory.append(Transition(*args))
+        self.memory.append(modules.Transition(*args))
     
     def sample(self, batch_size):
         return random.sample(self.memory, batch_size)
@@ -23,7 +22,7 @@ class ReplayMemory(object):
         return len(self.memory)
 
 
-class DQN(nn.Module):
+class Model(nn.Module):
     def __init__(self, n_observations, n_actions) -> None:
         super().__init__()
         self.layer1 = nn.Linear(n_observations, 128)

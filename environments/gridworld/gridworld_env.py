@@ -1,15 +1,38 @@
 import numpy as np
 import cv2
 from copy import deepcopy
+import modules
 
 
-class GridWorldEnv():
-    ACTIONS = {
-        0: (-1, 0),  # Up
-        1: (1, 0),   # Down
-        2: (0, -1),  # Left
-        3: (0, 1),   # Right
-    }
+
+class GridWorldActionSpace(modules.ActionSpace):
+    def __init__(self, 
+                 actions_dict: dict[int, tuple[int, int]] = {
+                     0: (-1, 0),  # Up
+                     1: (1, 0),   # Down
+                     2: (0, -1),  # Left
+                     3: (0, 1),   # Right
+                 },
+    ) -> None:
+        
+        self._actions_dict = actions_dict
+    
+    @property
+    def n(self) -> int:
+        return self._actions_dict.__len__()
+    
+    @property
+    def actions(self) -> dict:
+        return self._actions_dict
+    
+    def sample(self) -> int:
+        return np.random.randint(low=0, high=self.n)
+    
+    def __len__(self) -> int:
+        return self.n
+
+
+class GridWorldEnv(modules.Env):
     
     WORLD_CONSTANTS = {
         "obstacle": -1,
@@ -31,6 +54,8 @@ class GridWorldEnv():
             obstacle_positions: list[tuple[int, int],],
             max_steps: int = 50,
         ) -> None:
+        
+        self.action_space = GridWorldActionSpace()
         
         self.world_size = world_size
         
@@ -60,11 +85,11 @@ class GridWorldEnv():
             return self.observation(), 0.0, self.terminated, self.truncated, {}
         
         # Check if action is allowed
-        if action not in self.ACTIONS:
+        if action not in self.action_space.actions:
             raise ValueError(f"Invalid action encountered: {action}")
         
         # Get new position
-        movement = self.ACTIONS[action]
+        movement = self.action_space.actions[action]
         new_position = (self.player_position[0] + movement[0], self.player_position[1] + movement[1])
         
         # Update player position if movement is valid
@@ -169,10 +194,6 @@ class GridWorldEnv():
     def close(self):
         cv2.destroyAllWindows()
 
-        
-    def sample_action_space(self) -> int:
-        return np.random.randint(low=0, high=self.ACTIONS.__len__())
-
 
     def _world_builder(self, size, goal, obstacles, dtype=np.int8) -> np.ndarray:
         C = self.WORLD_CONSTANTS
@@ -218,7 +239,7 @@ def main() -> None:
         
         while not terminated and not truncated:
             
-            action = np.random.randint(0, 4) # Randomly sample an action within the boundaries of the action space
+            action = env.action_space.sample() # Randomly sample an action within the boundaries of the action space
             observation, reward, terminated, truncated, _ = env.step(action=action) # Step the env forward one time step, performing the defined action
             env.render()
             score += reward # Add received reward to total score
